@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TeacherSAOImpl implements ITeacherDAO{
@@ -97,6 +98,25 @@ public class TeacherSAOImpl implements ITeacherDAO{
 
     @Override
     public List<Teacher> getByLastName(String lastname) throws TeacherDaoException {
-        return null;
+        List<Teacher> teachers = new ArrayList<>();
+        ResultSet rs;
+        String sql = "SELECT * FROM TEACHERS WHERE LASTNAME LIKE ?";
+
+        try (Connection connection = DBUtil.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, lastname + "%");
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Teacher teacher = new Teacher(
+                        rs.getInt("ID"),
+                        rs.getString("FIRSTNAME"),
+                        rs.getString("LASTNAME"));
+            teachers.add(teacher);
+        }return teachers;
+        }catch (SQLException e){
+            e.printStackTrace();
+            throw new TeacherDaoException("SQL Error in teacher delete with id: "+ lastname);
+        }
     }
 }
