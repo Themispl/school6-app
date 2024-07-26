@@ -1,7 +1,7 @@
 package gr.aueb.cf.schoolapp.service;
 
 import gr.aueb.cf.schoolapp.dao.ITeacherDAO;
-import gr.aueb.cf.schoolapp.dao.exceptions.TeacherDaoException;
+import gr.aueb.cf.schoolapp.dao.exceptions.TeacherDAOException;
 import gr.aueb.cf.schoolapp.dto.TeacherInsertDTO;
 import gr.aueb.cf.schoolapp.dto.TeacherUpdateDTO;
 import gr.aueb.cf.schoolapp.model.Teacher;
@@ -17,20 +17,20 @@ public class TeacherServiceImpl implements ITeacherService{
     }
 
     @Override
-    public Teacher insertTeacher(TeacherInsertDTO dto) throws TeacherDaoException {
+    public Teacher insertTeacher(TeacherInsertDTO dto) throws TeacherDAOException {
         Teacher teacher;
         try{
             teacher = mapToTeacher(dto);
             return teacherDAO.insert(teacher);
 
-        }catch(TeacherDaoException e){
+        }catch(TeacherDAOException e){
             e.printStackTrace();
             throw e;
         }
     }
 
     @Override
-    public Teacher updateTeacher(TeacherInsertDTO dto) throws TeacherDaoException, TeacherNotFoundException {
+    public Teacher updateTeacher(TeacherUpdateDTO dto) throws TeacherDAOException, TeacherNotFoundException {
         Teacher teacher;
         try{
             teacher = mapToTeacher(dto);
@@ -41,27 +41,27 @@ public class TeacherServiceImpl implements ITeacherService{
 
             return teacherDAO.update(teacher);
 
-        }catch(TeacherDaoException | TeacherNotFoundException e){
+        }catch(TeacherDAOException | TeacherNotFoundException e){
             e.printStackTrace();
             throw e;
         }
     }
 
     @Override
-    public void deleteTeacher(Integer id) throws TeacherDaoException, TeacherNotFoundException {
+    public void deleteTeacher(Integer id) throws TeacherDAOException, TeacherNotFoundException {
         try{
             if(teacherDAO.getById(id) == null){
                 throw new TeacherNotFoundException("Not found");
             }
             teacherDAO.delete(id);
-        }catch(TeacherDaoException | TeacherNotFoundException e){
+        }catch(TeacherDAOException | TeacherNotFoundException e){
             e.printStackTrace();
             throw e;
         }
     }
 
     @Override
-    public Teacher getTeacherById(Integer id) throws TeacherDaoException, TeacherNotFoundException {
+    public Teacher getTeacherById(Integer id) throws TeacherDAOException, TeacherNotFoundException {
        Teacher teacher;
         try{
         teacher = teacherDAO.getById(id);
@@ -69,19 +69,19 @@ public class TeacherServiceImpl implements ITeacherService{
             throw new TeacherNotFoundException("Teacher Not found with id" + id);
         }
         return teacher;
-    }catch(TeacherDaoException | TeacherNotFoundException e){
+    }catch(TeacherDAOException | TeacherNotFoundException e){
         e.printStackTrace();
         throw e;
     }
     }
 
     @Override
-    public List<Teacher> getTeachersByLastname(String lastname) throws TeacherDaoException {
+    public List<Teacher> getTeachersByLastname(String lastname) throws TeacherDAOException {
         List<Teacher> teachers;
         try{
             teachers = teacherDAO.getByLastName(lastname);
             return teachers;
-        }catch(TeacherDaoException e){
+        }catch(TeacherDAOException e){
             e.printStackTrace();
             throw e;
         }

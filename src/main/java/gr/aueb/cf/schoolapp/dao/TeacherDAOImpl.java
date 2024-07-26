@@ -1,6 +1,6 @@
 package gr.aueb.cf.schoolapp.dao;
 
-import gr.aueb.cf.schoolapp.dao.exceptions.TeacherDaoException;
+import gr.aueb.cf.schoolapp.dao.exceptions.TeacherDAOException;
 import gr.aueb.cf.schoolapp.model.Teacher;
 import gr.aueb.cf.schoolapp.service.util.DBUtil;
 
@@ -11,9 +11,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TeacherSAOImpl implements ITeacherDAO{
+public class TeacherDAOImpl implements ITeacherDAO{
     @Override
-    public Teacher insert(Teacher teacher) throws TeacherDaoException {
+    public Teacher insert(Teacher teacher) throws TeacherDAOException {
         String sql ="INSERT INTO TEACHERS (FIRSTNAME, LASTNAME) VALUES (?, ?)";
 
         try (Connection connection = DBUtil.getConnection();
@@ -30,12 +30,12 @@ public class TeacherSAOImpl implements ITeacherDAO{
             return teacher;
         }catch (SQLException e){
             e.printStackTrace();
-            throw new TeacherDaoException("SQL Error in teacher insert: "+ teacher);
+            throw new TeacherDAOException("SQL Error in teacher insert: "+ teacher);
         }
     }
 
     @Override
-    public Teacher update(Teacher teacher) throws TeacherDaoException {
+    public Teacher update(Teacher teacher) throws TeacherDAOException {
         String sql ="UPDATE INTO TEACHERS SET FIRSTNAME=? , LASTNAME =? WHERE ID= ?";
         try (Connection connection = DBUtil.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)){
@@ -54,12 +54,12 @@ public class TeacherSAOImpl implements ITeacherDAO{
             return teacher;
         }catch (SQLException e){
             e.printStackTrace();
-            throw new TeacherDaoException("SQL Error in teacher update: "+ teacher);
+            throw new TeacherDAOException("SQL Error in teacher update: "+ teacher);
         }
     }
 
     @Override
-    public void delete(Integer id) throws TeacherDaoException {
+    public void delete(Integer id) throws TeacherDAOException {
             String sql = "DELETE FROM TEACHERS WHERE ID = ?";
         try (Connection connection = DBUtil.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)){
@@ -67,12 +67,12 @@ public class TeacherSAOImpl implements ITeacherDAO{
             ps.executeUpdate();
         }catch (SQLException e){
             e.printStackTrace();
-            throw new TeacherDaoException("SQL Error in teacher delete with id: "+ id);
+            throw new TeacherDAOException("SQL Error in teacher delete with id: "+ id);
         }
     }
 
     @Override
-    public Teacher getById(Integer id) throws TeacherDaoException {
+    public Teacher getById(Integer id) throws TeacherDAOException {
         String sql = "SELECT * FROM TEACHERS WHERE ID = ?";
         Teacher teacher = null;
         ResultSet rs;
@@ -92,12 +92,12 @@ public class TeacherSAOImpl implements ITeacherDAO{
             return  teacher;
         }catch (SQLException e){
             e.printStackTrace();
-            throw new TeacherDaoException("SQL Error in teacher get by id with id: "+ id);
+            throw new TeacherDAOException("SQL Error in teacher get by id with id: "+ id);
         }
     }
 
     @Override
-    public List<Teacher> getByLastName(String lastname) throws TeacherDaoException {
+    public List<Teacher> getByLastName(String lastname) throws TeacherDAOException {
         List<Teacher> teachers = new ArrayList<>();
         ResultSet rs;
         String sql = "SELECT * FROM TEACHERS WHERE LASTNAME LIKE ?";
@@ -116,7 +116,7 @@ public class TeacherSAOImpl implements ITeacherDAO{
         }return teachers;
         }catch (SQLException e){
             e.printStackTrace();
-            throw new TeacherDaoException("SQL Error in teacher delete with id: "+ lastname);
+            throw new TeacherDAOException("SQL Error in teacher delete with id: "+ lastname);
         }
     }
 }

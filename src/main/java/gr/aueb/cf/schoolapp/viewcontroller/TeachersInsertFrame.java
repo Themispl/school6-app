@@ -6,7 +6,15 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import gr.aueb.cf.schoolapp.Main;
 
-import gr.aueb.cf.schoolapp.service.util.DBUtil;
+import gr.aueb.cf.schoolapp.dao.ITeacherDAO;
+import gr.aueb.cf.schoolapp.dao.TeacherDAOImpl;
+import gr.aueb.cf.schoolapp.dao.exceptions.TeacherDAOException;
+import gr.aueb.cf.schoolapp.dto.TeacherInsertDTO;
+import gr.aueb.cf.schoolapp.dto.TeacherReadOnlyDTO;
+import gr.aueb.cf.schoolapp.model.Teacher;
+import gr.aueb.cf.schoolapp.service.ITeacherService;
+import gr.aueb.cf.schoolapp.service.TeacherServiceImpl;
+import gr.aueb.cf.schoolapp.validator.TeacherValidator;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -17,17 +25,18 @@ import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.Toolkit;
+import java.util.Map;
 
 public class TeachersInsertFrame extends JFrame {
+	//Wiring
+	private final ITeacherDAO teacherDAO = new TeacherDAOImpl();
+	private  final ITeacherService teacherService = new TeacherServiceImpl(teacherDAO);
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -128,45 +137,47 @@ public class TeachersInsertFrame extends JFrame {
 		JButton insertBtn = new JButton("Εισαγωγή");
 		insertBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//Data Binding
-				 String inputFirstname = firstnameTxt.getText().trim();
-				 String  inputLastname = lastnameTxt.getText().trim();
-				
-				
-				
-				if(inputFirstname.equals("")) {
-					errorFirstname.setText("το ονομα ειναι υποχρεωτικο");
-				}
-				if(!inputFirstname.equals("")) {
-					errorFirstname.setText("");
-				}
-				if(inputLastname.equals("")) {
-					errorLastname.setText("το ονομα ειναι υποχρεωτικο");
-				}
-				if(!inputLastname.equals("")) {
-					errorLastname.setText("");
-				}
-				if(inputFirstname.equals("") || inputLastname.equals("")) {
-					return;
-				}
-				
-				
-				String sql = "INSERT INTO TEACHERS(FIRSTNAME, LASTNAME) VALUES(?, ?)";
-				try (Connection conn = DBUtil.getConnection();
-						PreparedStatement ps = conn.prepareStatement(sql)){
-					
-					ps.setString(1, inputFirstname);
-					ps.setString(2, inputLastname);
-				
-				int n = ps.executeUpdate();
-				JOptionPane.showMessageDialog(null, n + "recorde were insert","INSERT", JOptionPane.PLAIN_MESSAGE);
-				
-				}catch (SQLException e1){
-					//e1.printStackTrace();
-					JOptionPane.showMessageDialog(null, " insert error", "Error", JOptionPane.ERROR_MESSAGE);
+				Map<String, String> errors;
+				TeacherInsertDTO insertDTO = new TeacherInsertDTO();
+				String firstnameMessage;
+				String lastNameMessage;
+				Teacher teacher;
+
+				try{
+					insertDTO.setFirstname(firstnameTxt.getText().trim());
+					insertDTO.setLastname(lastnameTxt.getText().trim());
+
+					errors = TeacherValidator.validate(insertDTO);
+
+					if(!errors.isEmpty()){
+						firstnameMessage = errors.getOrDefault("firstname", "");//to idio einai kai to kato
+						lastNameMessage = errors.containsKey("lastname") ? errors.get("lastname") : "";
+
+						if(!firstnameMessage.isEmpty()){
+							errorFirstname.setText(firstnameMessage);
+						}
+						if(!lastNameMessage.isEmpty()){
+							errorFirstname.setText(lastNameMessage);
+						}
+						if(firstnameMessage.isEmpty()){
+							errorFirstname.setText("");
+						}
+						if(lastNameMessage.isEmpty()){
+							errorFirstname.setText("");
+						}
+						return;
+					}
+					teacher = teacherService.insertTeacher(insertDTO);
+					TeacherReadOnlyDTO readOnlyDTO = mapToReadOnlyDTO(teacher);
+					JOptionPane.showMessageDialog(null, "Teacher with lastname: " + teacher.getLastname(), "Insert Teacher", JOptionPane.INFORMATION_MESSAGE);
+				}catch(TeacherDAOException e1){
+					e1.printStackTrace();
+					JOptionPane.showMessageDialog(null, "Insertion Error", "error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
+
+
 		insertBtn.setForeground(new Color(0, 0, 255));
 		insertBtn.setFont(new Font("Tahoma", Font.BOLD, 12));
 		insertBtn.setBounds(180, 206, 109, 23);
@@ -184,4 +195,8 @@ public class TeachersInsertFrame extends JFrame {
 		closeBtn.setBounds(299, 206, 109, 23);
 		contentPane.add(closeBtn);
 	}
+	private TeacherReadOnlyDTO mapToReadOnlyDTO(Teacher teacher){
+		return new TeacherReadOnlyDTO(teacher.getFirstname(), teacher.getFirstname(),teacher.getId());
+	}
+
 }

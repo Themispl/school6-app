@@ -1,6 +1,5 @@
 package gr.aueb.cf.schoolapp.service.exceptions;
 
-import gr.aueb.cf.schoolapp.dao.exceptions.TeacherDaoException;
 import gr.aueb.cf.schoolapp.model.Teacher;
 
 import java.io.Serial;

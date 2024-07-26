@@ -3,10 +3,11 @@ package gr.aueb.cf.schoolapp.dto;
 public class TeacherUpdateDTO  extends BaseDTO{
     private Integer id;
 
-    public TeacherUpdateDTO(){
+    public TeacherUpdateDTO() {
 
     }
-    public TeacherUpdateDTO(String firstname, String lastname, Integer id) {
+
+    public TeacherUpdateDTO(Integer id, String firstname, String lastname) {
         super(firstname, lastname);
         this.id = id;
     }
@@ -21,8 +22,6 @@ public class TeacherUpdateDTO  extends BaseDTO{
 
     @Override
     public String toString() {
-        return "TeacherUpdateDTO{" +
-                "id=" + id + ", "+this.getFirstname()+ ", " + getLastname() +
-                '}';
+        return "{" + id + ", " + getFirstname() + ", " + getLastname() + "}";
     }
 }
